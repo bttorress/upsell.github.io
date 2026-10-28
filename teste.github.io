@@ -1,54 +1,451 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teste Upsell Cartpanda</title>
-        <script src="https://assets.mycartpanda.com/cartx-ecomm-ui-assets/js/libs/ocu-external.js"> </script>
-        <script> new OcuExternal(); </script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #F4F4F4;
-        }
-        .container {
-            text-align: center;
-        }
-        a.button {
-            display: inline-block;
-            margin: 10px;
-            padding: 15px 30px;
-            text-decoration: none;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .accept {
-            background-color: #4CAF50;
-            color: white;
-        }
-        .decline {
-            background-color: #F44336;
-            color: white;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>UPSELL • Baú das Ofertas Escaladas</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+   <!-- Cartpanda OCU Script (OBRIGATÓRIO) -->
+  <script src="https://assets.mycartpanda.com/cartx-ecomm-ui-assets/js/libs/ocu-external.js"></script>
+  <script>
+  new OcuExternal();
+  </script>
+
+
+  <style>
+    :root{
+      --bg:#0b0f14;
+      --bg2:#0a0d12;
+      --ink:#e8ecf1;
+      --muted:#a5b0bd;
+      --gold:#ffd700;          /* detalhes em dourado */
+      --gold2:#c9a000;
+      --accent:#25D366;        /* verde WhatsApp para CTA principal */
+      --accent-strong:#1eb255;
+      --danger:#888f9b;
+      --card:#121821;
+      --shadow:0 10px 40px rgba(0,0,0,.45);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:
+        radial-gradient(1200px 600px at 80% -20%, #1b2230 0%, transparent 60%),
+        radial-gradient(800px 400px at -10% 30%, #15202c 0%, transparent 60%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+      color:var(--ink);
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      line-height:1.4;
+    }
+
+    .wrap{max-width:1080px;margin:0 auto;padding:24px}
+    header{padding:18px 0 8px}
+    .badge{
+      display:inline-block;
+      padding:6px 12px;
+      border:1px solid #2a3242;
+      border-radius:999px;
+      color:var(--muted);
+      font-size:12px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      background:rgba(255,255,255,.02);
+      backdrop-filter: blur(2px);
+    }
+    h1{
+      font-family:Orbitron,Inter,sans-serif;
+      font-weight:800;
+      letter-spacing:.3px;
+      font-size:clamp(26px,3vw,40px);
+      margin:10px 0 10px;
+      line-height:1.15;
+    }
+    .hl{color:var(--gold)}
+    .sub{
+      color:var(--muted);
+      font-size:clamp(14px,2.1vw,18px);
+      max-width:900px
+    }
+
+    /* ====== VSL Card with gold animated border ====== */
+    .vsl-card{
+      position:relative;
+      margin:28px auto 18px;
+      border-radius:16px;
+      padding:14px;
+      background:linear-gradient(145deg,#0e141d,#0a0f17);
+      box-shadow: var(--shadow);
+      isolation:isolate;
+    }
+    .vsl-card::before{
+      content:"";
+      position:absolute; inset:-2px;
+      border-radius:18px;
+      padding:2px;
+      background:
+        conic-gradient(from 0deg,
+          rgba(255,215,0,.12),
+          rgba(255,215,0,.35),
+          rgba(201,160,0,.20),
+          rgba(255,215,0,.12));
+      -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+              mask-composite: exclude;
+      animation: spin 6s linear infinite;
+      filter: drop-shadow(0 0 20px rgba(255,215,0,.18));
+      z-index:-1;
+    }
+    @keyframes spin {to{transform:rotate(360deg)}}
+
+    .player{
+      aspect-ratio:16/9;
+      width:100%;
+      border-radius:12px;
+      overflow:hidden;
+      background:#000;
+    }
+
+    /* ====== Delay Module ====== */
+    .gate{
+      margin:14px 0 0;
+      background:rgba(255,255,255,.02);
+      border:1px solid #202737;
+      color:var(--muted);
+      border-radius:12px;
+      padding:14px 16px;
+      display:flex; gap:14px; align-items:center; flex-wrap:wrap;
+    }
+    .progress{
+      flex:1 1 240px; height:10px; background:#111723; border-radius:999px; overflow:hidden;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,.6);
+    }
+    .bar{height:100%; width:0%; background:linear-gradient(90deg,var(--gold),#ffe77a); transition:width .3s ease}
+    .time{min-width:132px; font-weight:700; color:#ffe77a}
+
+    /* ====== Offer bullets ====== */
+    .grid{
+      display:grid; gap:16px;
+      grid-template-columns:repeat(12,1fr);
+      margin:26px 0 12px;
+    }
+    .card{
+      grid-column:span 6;
+      background:var(--card);
+      border:1px solid #1e2836;
+      padding:16px;
+      border-radius:14px;
+      box-shadow:var(--shadow);
+    }
+    .card h3{
+      margin:0 0 8px;
+      font-size:18px;
+      color:#fff
+    }
+    .card p{margin:0;color:var(--muted)}
+
+    @media (max-width: 860px){
+      .grid{grid-template-columns:1fr}
+      .card{grid-column:auto}
+    }
+
+    /* ====== CTA Area ====== */
+    .cta-wrap{margin:18px 0 80px;text-align:center}
+    .cta{
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      padding:16px 22px;
+      border-radius:12px;
+      font-weight:800; letter-spacing:.02em;
+      text-transform:uppercase;
+      font-size:clamp(14px,2.4vw,16px);
+      text-decoration:none;
+      box-shadow:0 10px 30px rgba(37,211,102,.28), inset 0 -2px 0 rgba(0,0,0,.2);
+      background:linear-gradient(180deg,var(--accent),var(--accent-strong));
+      color:#062c12;
+      border:1px solid #187c43;
+    }
+    .cta[disabled]{
+      pointer-events:none; opacity:.55; filter:grayscale(.2);
+    }
+
+    .decline{
+      display:inline-block; margin-top:12px;
+      color:#96a2b3; text-decoration:none; font-size:14px;
+      padding:10px 12px; border:1px dashed #2a3345; border-radius:10px;
+    }
+    .decline[disabled]{pointer-events:none; opacity:.5}
+
+    /* Sticky trust footer */
+    .trust{
+      position:fixed; left:0; right:0; bottom:0;
+      background:linear-gradient(180deg,rgba(14,18,26,.0),rgba(14,18,26,.8) 18%);
+      backdrop-filter: blur(6px);
+      border-top:1px solid #1c2332;
+      padding:10px 16px;
+      display:flex; align-items:center; justify-content:center; gap:14px;
+      color:var(--muted);
+      z-index:30;
+    }
+    .trust .dot{width:8px; height:8px; border-radius:50%; background:var(--gold)}
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Teste de Upsell Cartpanda</h1>
-        <p>Você deseja aceitar esta oferta?</p>
-        <div>
-            <a class="button accept" href="https://brteste1.mycartpanda.com/ex-ocu/next-offer/e9V5LM62bz?accepted=yes">Aceitar Oferta</a>
-        </div>
-        <div>
-            <a class="button decline" href="https://brteste1.mycartpanda.com/ex-ocu/next-offer/e9V5LM62bz?accepted=no">Recusar Oferta</a>
-        </div>
-    </div>
+  <div class="wrap">
+    <header>
+      <span class="badge">Oferta exclusiva • Somente agora</span>
+      <h1>
+        Desbloqueie o <span class="hl">Baú das Ofertas Escaladas</span>  
+        e <span class="hl">multiplique</span> os resultados do seu 6X.
+      </h1>
+      <p class="sub">
+        Você acabou de garantir o treinamento <strong>Low Ticket 6X</strong>.  
+        Agora, veja como os alunos que mais escalam acessam <em>ofertas prontas para copiar</em>,  
+        criativos vencedores e um mapa de tráfego que acelera de <span class="hl">dias para horas</span>.  
+        Assista ao vídeo abaixo — a liberação dos botões ocorre ao final do contador.
+      </p>
+    </header>
+
+    <!-- ====== VSL ====== -->
+    <section class="vsl-card" aria-label="Vídeo da oferta">
+      <div class="player">
+        <!-- Cole seu player VTurb exatamente aqui -->
+        <!-- PLAYER ANTI-SEEK (sem tempo/controles) -->
+<div class="upsell-vsl">
+  <div class="upsell-ratio">
+    <video id="upsellVideo"
+      playsinline
+      preload="metadata"
+      disablepictureinpicture
+      controlslist="nodownload noplaybackrate noremoteplayback nofullscreen">
+      <!-- src é carregado via JS (hls.js ou HLS nativo) -->
+    </video>
+
+    <!-- Overlay de Play -->
+    <button class="upsell-play" id="upsellPlayBtn" aria-label="Reproduzir vídeo">▶</button>
+  </div>
+</div>
+
+<!-- hls.js (CDN) -->
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script>
+  (function () {
+    const SRC = "https://vz-7c67382b-a10.b-cdn.net/52f6ea47-9a05-47be-9420-015c484601a6/playlist.m3u8";
+
+    const video = document.getElementById('upsellVideo');
+    const playBtn = document.getElementById('upsellPlayBtn');
+
+    // NUNCA mostrar os controles nativos
+    video.controls = false;
+
+    // Carrega HLS
+    if (window.Hls && Hls.isSupported()) {
+      const hls = new Hls({ maxBufferLength: 30 });
+      hls.loadSource(SRC);
+      hls.attachMedia(video);
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      // iOS / Safari: HLS nativo
+      video.src = SRC;
+    }
+
+    // Botão play overlay
+    playBtn.addEventListener('click', async () => {
+      playBtn.style.display = 'none';
+      try { await video.play(); } catch (e) { playBtn.style.display = 'block'; }
+    });
+
+    // Anti-seek: trava avanço além do já assistido
+    let maxTime = 0;
+    let seekingBack = false;
+
+    video.addEventListener('timeupdate', () => {
+      if (!seekingBack) {
+        // Atualiza maior tempo alcançado
+        if (video.currentTime > maxTime) maxTime = video.currentTime;
+      }
+    });
+
+    video.addEventListener('seeking', () => {
+      // Se tentar avançar além do maxTime + tolerância, volta
+      const allowed = maxTime + 0.75; // tolerância de 750ms
+      if (video.currentTime > allowed) {
+        seekingBack = true;
+        video.currentTime = allowed;
+      }
+    });
+
+    video.addEventListener('seeked', () => {
+      // Libera novamente
+      seekingBack = false;
+    });
+
+    // Evita atalhos de teclado que pulam (setas, home/end, etc.)
+    document.addEventListener('keydown', (e) => {
+      const blockKeys = ['ArrowLeft','ArrowRight','Home','End','PageUp','PageDown'];
+      if (blockKeys.includes(e.key)) e.preventDefault();
+      // barra de espaço só se vídeo tiver foco
+      if (e.key === ' ' && e.target === document.body) e.preventDefault();
+    }, { passive: false });
+
+    // Impede toque/arrasto de timeline em alguns navegadores
+    video.addEventListener('pointerdown', e => e.stopPropagation(), true);
+    video.addEventListener('touchstart', e => e.stopPropagation(), { passive:false });
+  })();
+</script>
+
+<style>
+  .upsell-vsl { max-width: 960px; margin: 16px auto; }
+  .upsell-ratio {
+    position: relative;
+    aspect-ratio: 16/9;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #000;
+    box-shadow: 0 12px 28px rgba(0,0,0,.25);
+  }
+  .upsell-ratio video {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    display: block; border: 0; outline: 0;
+    /* garante que controles nativos não apareçam em alguns UAs */
+  }
+  .upsell-play {
+    position: absolute; inset: 0; margin: auto;
+    width: 84px; height: 84px; border-radius: 50%;
+    background: rgba(255,255,255,.12);
+    border: 2px solid rgba(255,255,255,.45);
+    color: #fff; font-size: 28px; font-weight: 900;
+    display: grid; place-items: center;
+    cursor: pointer; backdrop-filter: blur(2px);
+    transition: transform .12s ease, background .12s ease;
+  }
+  .upsell-play:hover { transform: scale(1.04); background: rgba(255,255,255,.18); }
+  @media (max-width: 560px){ .upsell-play{ width:64px; height:64px; font-size:22px; } }
+</style>
+
+      </div>
+
+      <!-- Delay / Countdown -->
+      <div class="gate" role="status" aria-live="polite">
+        <div class="progress" aria-hidden="true"><div class="bar" id="bar"></div></div>
+        <div class="time"><span id="mm">03</span>:<span id="ss">15</span></div>
+        <div>Os botões serão liberados ao final do vídeo.</div>
+      </div>
+    </section>
+
+    <!-- ====== Highlights ====== -->
+    <section class="grid" aria-label="O que você recebe no Baú">
+      <div class="card">
+        <h3>🔓 Biblioteca de Ofertas Validadas</h3>
+        <p>Lista viva das ofertas mais escaladas do momento + links e estruturas para clonar sem adivinhar.</p>
+      </div>
+      <div class="card">
+        <h3>🎯 Criativos Campeões</h3>
+        <p>Modelos de anúncios com ângulos de alta taxa de clique para aplicar no mesmo dia.</p>
+      </div>
+      <div class="card">
+        <h3>🗺️ Rotas de Tráfego</h3>
+        <p>Checklists práticos de testes: orçamento, segmentação e métricas de decisão (sem achismo).</p>
+      </div>
+      <div class="card">
+        <h3>⚡ Aceleração 7 Dias</h3>
+        <p>Plano rápido para sair do “validando” para “escalando” com passos diários simples.</p>
+      </div>
+    </section>
+
+    <!-- ====== CTAs ====== -->
+    <div class="cta-wrap">
+      <!-- Substitua os links abaixo pelos seus URLs finais -->
+      <a id="accept" class="cta" href="#" disabled
+         aria-disabled="true" rel="nofollow">
+         🚀 QUERO APROVEITAR E ESCALAR AS VENDAS
+      </a>
+      <br />
+      <a id="decline" class="decline" href="#" disabled aria-disabled="true">
+        Não tenho interesse em escalar rápido
+      </a>
+      <p style="margin-top:10px;color:var(--muted);font-size:12px">
+        *Acesso imediato. Vagas limitadas para manter a curadoria atualizada.
+      </p>
+    </div>
+  </div>
+
+  <!-- Sticky Trust -->
+  <div class="trust">
+    <span class="dot" aria-hidden="true"></span>
+    <span>Pagamento 100% seguro • Garantia de 7 dias • Acesso vitalício às atualizações do Baú</span>
+  </div>
+
+  <script>
+    // === CONFIGURE AQUI OS LINKS ===
+    const ACCEPT_URL  = "https://pagamento.hqverse.online/ex-ocu/next-offer/q7YEOZa2Mp?accepted=yes";
+	const DECLINE_URL = "https://pagamento.hqverse.online/ex-ocu/next-offer/q7YEOZa2Mp?accepted=no";
+
+
+    // Delay em segundos (3 minutos e 15 segundos = 195s)
+    const DELAY = 195;
+
+    const accept = document.getElementById('accept');
+    const decline = document.getElementById('decline');
+    const mm = document.getElementById('mm');
+    const ss = document.getElementById('ss');
+    const bar = document.getElementById('bar');
+
+    // prepara hrefs somente quando liberar
+    accept.addEventListener('click', (e)=>{
+      if(accept.hasAttribute('disabled')) e.preventDefault();
+    });
+    decline.addEventListener('click', (e)=>{
+      if(decline.hasAttribute('disabled')) e.preventDefault();
+    });
+
+    let remaining = DELAY;
+    const total = DELAY;
+
+    function pad(n){return String(n).padStart(2,'0')}
+
+    const tick = setInterval(()=>{
+      remaining--;
+      if(remaining < 0){
+        clearInterval(tick);
+        mm.textContent = "00"; ss.textContent = "00";
+        bar.style.width = "100%";
+        unlock();
+        return;
+      }
+      const m = Math.floor(remaining/60);
+      const s = remaining%60;
+      mm.textContent = pad(m);
+      ss.textContent = pad(s);
+      bar.style.width = ((total-remaining)/total*100).toFixed(2) + "%";
+    }, 1000);
+
+    function unlock(){
+      accept.removeAttribute('disabled');
+      decline.removeAttribute('disabled');
+      accept.setAttribute('aria-disabled','false');
+      decline.setAttribute('aria-disabled','false');
+      accept.href = ACCEPT_URL;
+      decline.href = DECLINE_URL;
+
+      // micro realce quando libera
+      accept.animate([
+        { transform:'scale(1)', boxShadow:'0 10px 30px rgba(37,211,102,.28)' },
+        { transform:'scale(1.03)', boxShadow:'0 16px 40px rgba(37,211,102,.45)' },
+        { transform:'scale(1)', boxShadow:'0 10px 30px rgba(37,211,102,.28)' }
+      ], {duration:900, easing:'ease', iterations:1});
+    }
+
+    // Fallback: se o player não carregar, ainda libera depois do delay
+    window.addEventListener('error',()=>{}, true);
+  </script>
+
+
 </body>
 </html>
